@@ -3,245 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stutter Check</title>
+    <title>Stutter Detection and Classification</title>
     <style>
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #e6f0fa, #f0f2f5);
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 800px; /* added max-width for better responsiveness */
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
             color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
-            scroll-behavior: smooth;
         }
 
-        header {
-            background-color: #4a90e2;
-            color: #fff;
-            width: 100%;
+        p {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .upload-area {
+            border: 2px dashed #ccc;
+            padding: 20px;
             text-align: center;
-            padding: 20px 0;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            position: fixed;
-            top: 0;
-            z-index: 1000;
+            margin-bottom: 20px;
+            cursor: pointer;
         }
 
-        nav {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
+        .upload-area input[type="file"] {
+            display: none;
+        }
+
+        .upload-area.active {
+            border-color: #007bff;
+        }
+
+        #file-name {
             margin-top: 10px;
+            font-weight: bold;
         }
 
-        nav a {
-            color: #fff;
-            text-decoration: none;
-            font-weight: 500;
-            padding: 8px 20px;
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
+        #upload-button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
 
-        nav a:hover {
-            border-bottom: 2px solid #fff;
+        #upload-button:hover {
+            background-color: #0056b3;
         }
 
-        .content {
-            max-width: 1200px;
-            width: 90%;
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            margin-top: 100px;
-            padding: 40px;
-            text-align: center;
-            opacity: 0;
-            transform: translateY(30px);
-            animation: fadeIn 1s ease-out forwards;
+        #result {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
         }
 
-        @keyframes fadeIn {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .content h1 {
-            color: #4a90e2;
+        #result h2 {
             margin-bottom: 10px;
         }
 
-        .content p {
-            color: #666;
-            line-height: 1.8;
-        }
-
-        .features, .testimonials, .faq {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-            margin-top: 30px;
-        }
-
-        .feature-card, .testimonial-card, .faq-card {
-            background-color: #e6f0fa;
-            border-left: 5px solid #4a90e2;
-            padding: 20px;
-            width: 300px;
-            border-radius: 8px;
-            text-align: left;
-            transition: transform 0.3s ease;
-        }
-
-        .feature-card:hover, .testimonial-card:hover, .faq-card:hover {
-            transform: translateY(-5px);
-            background-color: #d7eafc;
-        }
-
-        .feature-card h3, .testimonial-card h3, .faq-card h3 {
-            color: #4a90e2;
+        #result p {
             margin-bottom: 5px;
         }
 
-        .footer {
-            margin-top: 40px;
-            padding: 20px;
-            background-color: #4a90e2;
-            color: #fff;
-            text-align: center;
-            width: 100%;
+        #result .stutter-detected {
+            color: red;
         }
 
-        .btn {
-            background-color: #4a90e2;
-            color: #fff;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s ease, box-shadow 0.3s ease;
-            margin-top: 20px;
-        }
-
-        .btn:hover {
-            background-color: #357ab8;
-            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
-        }
-
-        .icon {
-            font-size: 24px;
-            color: #4a90e2;
-            margin-bottom: 10px;
-        }
-
-        .contact-form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            text-align: left;
-        }
-
-        .contact-form input, 
-        .contact-form textarea {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #4a90e2;
-            border-radius: 5px;
-        }
-
-        .contact-form textarea {
-            resize: none;
-            height: 100px;
+        #result .stutter-not-detected {
+            color: green;
         }
     </style>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body>
-    <header>
-        <h1>Stutter Check</h1>
-        <nav>
-            <a href="#home">Home</a>
-            <a href="#about">About Us</a>
-            <a href="#features">Features</a>
-            <a href="#testimonials">Testimonials</a>
-            <a href="#faq">FAQ</a>
-            <a href="#contact">Contact</a>
-        </nav>
-    </header>
+    <div class="container">
+        <h1>Stutter Detection and Classification</h1>
+        <p>Upload an audio file to detect and classify stuttering.</p>
 
-    <div class="content" id="home">
-        <h1>Welcome to Stutter Check</h1>
-        <p>Our platform helps identify and assess speech patterns to detect stuttering effectively using advanced technology.</p>
-        <button class="btn">Try Stutter Check</button>
-    </div>
+        <div class="upload-area" id="upload-area">
+            <input type="file" id="file-input" accept=".wav,.mp3">
+            <p>Drag & Drop your audio file here or click to select</p>
+            <p id="file-name"></p>
+        </div>
 
-    <div class="content" id="about">
-        <h2>About Us</h2>
-        <p>Stutter Check is designed to assist individuals in recognizing and improving their speech patterns. With cutting-edge analysis tools, we provide detailed insights into speech fluency.</p>
-    </div>
+        <button id="upload-button">Upload and Analyze</button>
 
-    <div class="content" id="features">
-        <h2>Key Features</h2>
-        <div class="features">
-            <div class="feature-card">
-                <i class="fas fa-microphone icon"></i>
-                <h3>Real-Time Analysis</h3>
-                <p>Get instant feedback on your speech patterns with our AI-powered analysis system.</p>
-            </div>
-            <div class="feature-card">
-                <i class="fas fa-chart-line icon"></i>
-                <h3>Visual Insights</h3>
-                <p>Visual reports to help you track your progress and improvement over time.</p>
-            </div>
+        <div id="result" style="display: none;">
+            <h2>Analysis Result</h2>
+            <p id="stutter-status"></p>
+            <p id="stutter-type"></p>
+            <p id="confidence"></p>
         </div>
     </div>
 
-    <div class="content" id="testimonials">
-        <h2>What Our Users Say</h2>
-        <div class="testimonials">
-            <div class="testimonial-card">
-                <h3>Emily R.</h3>
-                <p>"Stutter Check gave me the confidence to improve my speech patterns. Highly recommended!"</p>
-            </div>
-            <div class="testimonial-card">
-                <h3>John D.</h3>
-                <p>"The visual insights were incredibly helpful. I've noticed significant progress!"</p>
-            </div>
-        </div>
-    </div>
+    <script>
+        const uploadArea = document.getElementById('upload-area');
+        const fileInput = document.getElementById('file-input');
+        const fileNameDisplay = document.getElementById('file-name');
+        const uploadButton = document.getElementById('upload-button');
+        const resultDiv = document.getElementById('result');
+        const stutterStatus = document.getElementById('stutter-status');
+        const stutterType = document.getElementById('stutter-type');
+        const confidence = document.getElementById('confidence');
 
-    <div class="content" id="faq">
-        <h2>Frequently Asked Questions</h2>
-        <div class="faq">
-            <div class="faq-card">
-                <h3>How does Stutter Check work?</h3>
-                <p>Our AI model analyzes your speech patterns and identifies stuttering behavior in real-time.</p>
-            </div>
-            <div class="faq-card">
-                <h3>Is it free to use?</h3>
-                <p>Yes, the basic analysis is free with premium features available for advanced insights.</p>
-            </div>
-        </div>
-    </div>
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
 
-    <div class="content" id="contact">
-        <h2>Contact Us</h2>
-        <form class="contact-form">
-            <input type="text" placeholder="Your Name" required>
-            <input type="email" placeholder="Your Email" required>
-            <textarea placeholder="Your Message" required></textarea>
-            <button class="btn">Send Message</button>
-        </form>
-    </div>
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('active');
+        });
 
-    <div class="footer">
-        &copy; 2025 Stutter Check. All rights reserved.
-    </div>
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('active');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('active');
+            fileInput.files = e.dataTransfer.files;
+            displayFileName();
+        });
+
+        fileInput.addEventListener('change', displayFileName);
+
+        function displayFileName() {
+            if (fileInput.files.length > 0) {
+                fileNameDisplay.textContent = fileInput.files[0].name;
+            } else {
+                fileNameDisplay.textContent = '';
+            }
+        }
+
+        uploadButton.addEventListener('click', () => {
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const formData = new FormData();
+                formData.append('audio', file);
+
+                // Simulate backend response (replace with actual API call)
+                simulateBackendResponse(formData);
+
+                // Real API call example (replace with your actual API endpoint)
+                /*
+                fetch('/api/analyze', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    displayResult(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred during analysis.');
+                });
+                */
+            } else {
+                alert('Please select a file.');
+            }
+        });
+
+        function simulateBackendResponse(formData) {
+            // Simulate processing delay
+            setTimeout(() => {
+                // Simulate backend analysis result
+                const simulatedResult = {
+                    stutterDetected: Math.random() > 0.5,
+                    stutterType: Math.random() > 0.5 ? 'Repetition' : 'Prolongation',
+                    confidence: (Math.random() * 100).toFixed(2) + '%'
+                };
+
+                displayResult(simulatedResult);
+            }, 1000); // 1 second delay
+        }
+
+        function displayResult(data) {
+            stutterStatus.textContent = data.stutterDetected ? 'Stutter Detected' : 'Stutter Not Detected';
+            stutterType.textContent = 'Stutter Type: ' + data.stutterType;
+            confidence.textContent = 'Confidence: ' + data.confidence;
+
+            stutterStatus.className = data.stutterDetected ? 'stutter-detected' : 'stutter-not-detected';
+
+            resultDiv.style.display = 'block';
+        }
+    </script>
 </body>
 </html>
