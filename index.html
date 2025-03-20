@@ -3,130 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StutterCheck</title>
+    <title>Stutter Detection and Classification</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap">
     <style>
         body {
-            font-family: sans-serif;
+            font-family: 'Montserrat', sans-serif;
             margin: 0;
             padding: 0;
-            background-image: url('https://unsplash.com/photos/a-plane-flying-in-the-sky-at-sunset-TIvFLeqZ4ec'); /* Replace with your image */
+            background-image: url('TIvFLeqZ4ec.jpg'); /* Replace with your downloaded image */
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            background-attachment: fixed; /* Optional: for fixed background */
+            background-attachment: fixed;
+            color: #fff;
         }
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            z-index: -1;
         }
 
-        .logo {
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-
-        nav ul {
-            list-style: none;
-            display: flex;
-        }
-
-        nav ul li {
-            margin-left: 20px;
-        }
-
-        nav ul li a {
-            text-decoration: none;
-            color: #333;
-            padding: 8px 15px;
-            border-radius: 5px;
-        }
-
-        nav ul li a.button {
-            background-color: #007bff;
-            color: white;
-        }
-
-        .hero {
-            text-align: center;
-            padding: 100px 20px;
-            background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent background */
-            margin: 50px auto;
+        .container {
+            width: 80%;
             max-width: 800px;
+            margin: 50px auto; /* Increased margin for better spacing */
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 30px; /* Increased padding */
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px); /* Add blur effect */
+        }
+
+        h1, h2 {
+            color: #fff;
+        }
+
+        p {
+            color: #eee;
+            line-height: 1.8;
+        }
+
+        .upload-area {
+            border: 2px dashed rgba(255, 255, 255, 0.5);
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 30px;
+            cursor: pointer;
             border-radius: 10px;
         }
 
-        .hero h1 {
-            font-size: 2.5em;
-            margin-bottom: 20px;
+        .upload-area input[type="file"] {
+            display: none;
         }
 
-        .hero p {
-            font-size: 1.1em;
-            line-height: 1.6;
-            margin-bottom: 30px;
+        .upload-area.active {
+            border-color: #007bff;
         }
 
-        .button {
-            background-color: #007bff;
-            color: white;
-            padding: 12px 25px;
+        #file-name {
+            margin-top: 15px;
+            font-weight: 500;
+            color: #eee;
+        }
+
+        #upload-button {
+            background-color: rgba(255, 255, 255, 0.3);
+            color: #fff;
+            padding: 12px 30px;
             border: none;
-            border-radius: 5px;
+            border-radius: 25px;
             cursor: pointer;
-            font-size: 1em;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease, transform 0.3s ease;
         }
 
-        .prediction-area {
+        #upload-button:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+            transform: scale(1.05);
+        }
+
+        #result {
             margin-top: 30px;
-        }
-
-        .prediction-area input[type="text"] {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-right: 10px;
-        }
-
-        footer {
-            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.5);
             padding: 20px;
-            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            background-color: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        #result h2 {
+            margin-bottom: 15px;
+        }
+
+        #result p {
+            margin-bottom: 10px;
+        }
+
+        #result .stutter-detected {
+            color: red;
+        }
+
+        #result .stutter-not-detected {
+            color: green;
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="logo">StutterCheck</div>
-        <nav>
-            <ul>
-                <li><a href="#">Home</a></li>
-                <li><a href="#">About Us</a></li>
-                <li><a href="#">Contact Us</a></li>
-                <li><a href="#" class="button">OUR WORK</a></li>
-            </ul>
-        </nav>
-    </header>
+    <div class="container">
+        <h1>Stutter Detection and Classification</h1>
+        <p>Upload an audio file to detect and classify stuttering.</p>
 
-    <section class="hero">
-        <h1>Welcome to StutterCheck</h1>
-        <p>Our stutter detection technology harnesses the power of machine learning algorithms to analyze speech patterns. By identifying subtle nuances in speech, our system can detect instances of stuttering, providing valuable insights for both individuals and professionals in the field of speech therapy.</p>
-        <button class="button">GET STARTED</button>
-        <div class="prediction-area">
-            <input type="text" placeholder="Enter text for prediction">
-            <button class="button">GET PREDICTION</button>
+        <div class="upload-area" id="upload-area">
+            <input type="file" id="file-input" accept=".wav,.mp3">
+            <p>Drag & Drop your audio file here or click to select</p>
+            <p id="file-name"></p>
         </div>
-    </section>
 
-    <footer>
-        <button class="button">New Sound Panel</button>
-    </footer>
+        <button id="upload-button">Upload and Analyze</button>
+
+        <div id="result" style="display: none;">
+            <h2>Analysis Result</h2>
+            <p id="stutter-status"></p>
+            <p id="stutter-type"></p>
+            <p id="confidence"></p>
+        </div>
+    </div>
 
     <script>
-        // You can add JavaScript interactivity here later.
+        // ... (Your JavaScript code remains the same) ...
     </script>
 </body>
 </html>
