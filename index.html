@@ -3,75 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fluency in AI</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap">
+    <title>Stutter Detection and Classification</title>
     <style>
         body {
-            font-family: 'Montserrat', sans-serif;
+            font-family: sans-serif;
             margin: 0;
             padding: 0;
-            background-image: url('TIvFLeqZ4ec.jpg'); /* Replace with your downloaded image */
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            color: #fff;
-            overflow-x: hidden; /* Prevent horizontal scroll */
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
-            z-index: -1;
+            background-color: #f4f4f4;
         }
 
         .container {
             width: 80%;
-            max-width: 800px;
-            margin: 80px auto;
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 50px;
-            border-radius: 20px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            animation: fadeIn 1s ease-out; /* Fade-in animation */
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            max-width: 800px; /* added max-width for better responsiveness */
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         h1, h2 {
-            color: #fff;
-            text-align: center;
-            margin-bottom: 30px;
+            color: #333;
         }
 
         p {
-            color: #eee;
-            line-height: 1.8;
-            text-align: center;
-            margin-bottom: 40px;
+            color: #555;
+            line-height: 1.6;
         }
 
         .upload-area {
-            border: 2px dashed rgba(255, 255, 255, 0.5);
-            padding: 30px;
+            border: 2px dashed #ccc;
+            padding: 20px;
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
             cursor: pointer;
-            border-radius: 15px;
-            transition: border-color 0.3s ease;
-        }
-
-        .upload-area:hover {
-            border-color: #007bff;
         }
 
         .upload-area input[type="file"] {
@@ -83,56 +48,36 @@
         }
 
         #file-name {
-            margin-top: 20px;
-            font-weight: 500;
-            color: #eee;
-            animation: slideUp 0.5s ease-out; /* Slide-up animation */
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            margin-top: 10px;
+            font-weight: bold;
         }
 
         #upload-button {
-            background-color: rgba(255, 255, 255, 0.3);
-            color: #fff;
-            padding: 15px 40px;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
             border: none;
-            border-radius: 30px;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 1.2em;
-            transition: background-color 0.3s ease, transform 0.3s ease;
-            animation: pulse 2s infinite ease-in-out; /* Pulse animation */
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
         }
 
         #upload-button:hover {
-            background-color: rgba(255, 255, 255, 0.4);
-            transform: scale(1.05);
+            background-color: #0056b3;
         }
 
         #result {
-            margin-top: 40px;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            padding: 30px;
-            border-radius: 15px;
-            background-color: rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(10px);
-            animation: fadeIn 1s ease-out; /* Fade-in animation */
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
         }
 
         #result h2 {
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         #result p {
-            margin-bottom: 15px;
+            margin-bottom: 5px;
         }
 
         #result .stutter-detected {
@@ -146,8 +91,8 @@
 </head>
 <body>
     <div class="container">
-        <h1>Fluency in AI</h1>
-        <p>Upload an audio file to analyze and enhance your speech fluency with AI-powered technology.</p>
+        <h1>Stutter Detection and Classification</h1>
+        <p>Upload an audio file to detect and classify stuttering.</p>
 
         <div class="upload-area" id="upload-area">
             <input type="file" id="file-input" accept=".wav,.mp3">
@@ -166,7 +111,97 @@
     </div>
 
     <script>
-        // ... (Your JavaScript code remains the same) ...
+        const uploadArea = document.getElementById('upload-area');
+        const fileInput = document.getElementById('file-input');
+        const fileNameDisplay = document.getElementById('file-name');
+        const uploadButton = document.getElementById('upload-button');
+        const resultDiv = document.getElementById('result');
+        const stutterStatus = document.getElementById('stutter-status');
+        const stutterType = document.getElementById('stutter-type');
+        const confidence = document.getElementById('confidence');
+
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('active');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('active');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('active');
+            fileInput.files = e.dataTransfer.files;
+            displayFileName();
+        });
+
+        fileInput.addEventListener('change', displayFileName);
+
+        function displayFileName() {
+            if (fileInput.files.length > 0) {
+                fileNameDisplay.textContent = fileInput.files[0].name;
+            } else {
+                fileNameDisplay.textContent = '';
+            }
+        }
+
+        uploadButton.addEventListener('click', () => {
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const formData = new FormData();
+                formData.append('audio', file);
+
+                // Simulate backend response (replace with actual API call)
+                simulateBackendResponse(formData);
+
+                // Real API call example (replace with your actual API endpoint)
+                /*
+                fetch('/api/analyze', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    displayResult(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred during analysis.');
+                });
+                */
+            } else {
+                alert('Please select a file.');
+            }
+        });
+
+        function simulateBackendResponse(formData) {
+            // Simulate processing delay
+            setTimeout(() => {
+                // Simulate backend analysis result
+                const simulatedResult = {
+                    stutterDetected: Math.random() > 0.5,
+                    stutterType: Math.random() > 0.5 ? 'Repetition' : 'Prolongation',
+                    confidence: (Math.random() * 100).toFixed(2) + '%'
+                };
+
+                displayResult(simulatedResult);
+            }, 1000); // 1 second delay
+        }
+
+        function displayResult(data) {
+            stutterStatus.textContent = data.stutterDetected ? 'Stutter Detected' : 'Stutter Not Detected';
+            stutterType.textContent = 'Stutter Type: ' + data.stutterType;
+            confidence.textContent = 'Confidence: ' + data.confidence;
+
+            stutterStatus.className = data.stutterDetected ? 'stutter-detected' : 'stutter-not-detected';
+
+            resultDiv.style.display = 'block';
+        }
     </script>
 </body>
 </html>
